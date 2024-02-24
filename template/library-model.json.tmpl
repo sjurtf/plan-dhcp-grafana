@@ -1,0 +1,112 @@
+{
+  "name": "Participant ports",
+  "model": {
+    "datasource": {
+      "type": "influxdb",
+      "uid": "MQM5XUJGk"
+    },
+    "gridPos": {
+      "h": 12,
+      "w": 14,
+      "x": 0,
+      "y": 8
+    },
+    "id": 2,
+    "title": "Participant ports",
+    "targets": [
+      {{range $i, $el := .Participants}}
+      {{- if $i}},{{- end}}
+      {
+        "alias": "{{.ComputerName}} $col",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "MQM5XUJGk"
+        },
+        "hide": false,
+        "measurement": "ports",
+        "orderByTime": "ASC",
+        "policy": "default",
+        "query": "SELECT mean(\"ifOutBits_rate\") AS \"ingress\", -mean(\"ifInBits_rate\") AS \"egress\" FROM \"ports\" WHERE (\"hostname\"::tag = '{{.SwitchName}}' AND \"ifName\"::tag = '{{.Port}}') AND $timeFilter GROUP BY time(5m) fill(linear)",
+        "queryType": "randomWalk",
+        "rawQuery": true,
+        "refId": "{{.RefId}}",
+        "resultFormat": "time_series"
+      }{{end}}
+    ],
+    "options": {
+      "tooltip": {
+        "mode": "single",
+        "sort": "none"
+      },
+      "legend": {
+        "showLegend": true,
+        "displayMode": "table",
+        "placement": "right",
+        "calcs": [
+          "last"
+        ]
+      }
+    },
+    "fieldConfig": {
+      "defaults": {
+        "custom": {
+          "drawStyle": "line",
+          "lineInterpolation": "linear",
+          "barAlignment": 0,
+          "lineWidth": 1,
+          "fillOpacity": 0,
+          "gradientMode": "none",
+          "spanNulls": false,
+          "insertNulls": false,
+          "showPoints": "auto",
+          "pointSize": 5,
+          "stacking": {
+            "mode": "none",
+            "group": "A"
+          },
+          "axisPlacement": "auto",
+          "axisLabel": "",
+          "axisColorMode": "text",
+          "axisBorderShow": false,
+          "scaleDistribution": {
+            "type": "linear"
+          },
+          "axisCenteredZero": false,
+          "hideFrom": {
+            "tooltip": false,
+            "viz": false,
+            "legend": false
+          },
+          "thresholdsStyle": {
+            "mode": "off"
+          }
+        },
+        "unitScale": true,
+        "color": {
+          "mode": "palette-classic"
+        },
+        "mappings": [],
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {
+              "color": "green",
+              "value": null
+            },
+            {
+              "color": "red",
+              "value": 80
+            }
+          ]
+        },
+        "unit": "binbps"
+      },
+      "overrides": []
+    },
+    "description": "",
+    "pluginVersion": "9.0.2",
+    "type": "timeseries"
+  },
+  "version": {{.Version}},
+  "kind": 1
+}
